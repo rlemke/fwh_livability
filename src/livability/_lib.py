@@ -223,6 +223,12 @@ def fetch_aqi(*, force: bool = False) -> dict[tuple[str, str], float]:
 # ---------------------------------------------------------------------------
 
 
+def normalize_geoid(geoid: str) -> str:
+    """AFF-style ``0500000US01027`` (census-us metrics) -> bare FIPS ``01027``."""
+    g = str(geoid or "")
+    return g.split("US")[-1] if "US" in g else g
+
+
 def assemble_counties() -> list[dict]:
     counties: list[dict] = []
     for state in _list_census_states():
@@ -233,9 +239,11 @@ def assemble_counties() -> list[dict]:
             fc = json.load(f)
         for ft in fc.get("features") or []:
             p = ft.get("properties") or {}
+            # metrics NAME is "Clay County, Alabama" — keep the county part
+            name = str(p.get("NAME") or "").split(",")[0].strip()
             counties.append({
-                "geoid": p.get("GEOID"), "name": p.get("NAME"), "state": state,
-                "geometry": ft.get("geometry"),
+                "geoid": normalize_geoid(p.get("GEOID")), "name": name,
+                "state": state, "geometry": ft.get("geometry"),
             })
     return counties
 
@@ -372,6 +380,11 @@ def build_livability_map(*, force: bool = False) -> LivabilityMapResult:
     for ft in feats:
         ft["properties"]["rank"] = rank_by_geoid.get(ft["properties"]["GEOID"])
 
+    if not ranked:
+        raise RuntimeError(
+            "0 of {} counties scored — indicator/geometry join produced nothing "
+            "(check GEOID normalization and source caches)".format(len(feats))
+        )
     fc = {"type": "FeatureCollection", "features": feats}
     coverage = {k: len(v) for k, v in indicator_values.items()}
     html = _render_html(fc, len(ranked), coverage)

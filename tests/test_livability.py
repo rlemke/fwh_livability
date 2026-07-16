@@ -47,6 +47,13 @@ def test_compute_scores_equal_weights_and_min_indicators():
     assert len(scores["good"]["pcts"]) == len(keys)
 
 
+def test_normalize_geoid():
+    from livability._lib import normalize_geoid
+    assert normalize_geoid("0500000US01027") == "01027"
+    assert normalize_geoid("01027") == "01027"
+    assert normalize_geoid("") == ""
+
+
 def test_norm_county_strips_suffixes():
     assert norm_county("Los Angeles County") == "LOS ANGELES"
     assert norm_county("East Baton Rouge Parish") == "EAST BATON ROUGE"
