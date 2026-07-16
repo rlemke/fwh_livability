@@ -1,0 +1,54 @@
+// livability domain — which US county is the best place to live?
+//
+// BuildLivabilityMap combines four open, county-keyed sources — Census ACS
+// (income, poverty, unemployment, education, rent burden, broadband), CDC
+// PLACES (fair/poor self-rated health), FEMA National Risk Index (natural
+// hazards), and EPA AirData (median AQI) — into an EQUAL-WEIGHT composite:
+// each indicator is percentile-ranked across all counties (signed so 100 =
+// good), the score is the mean of available percentiles (>= 6 required).
+// Output: national county choropleth (index.html) with an explainable
+// per-indicator popup + a top-50 rankings page (rankings.html).
+// Weights are a disclosed value judgment, not truth.
+
+namespace livability.maps {
+    /** Equal-weight county livability composite over ACS + CDC PLACES + FEMA
+      * NRI + EPA AQI; renders the national choropleth + top-50 rankings.
+      * Counties with fewer than 6 available indicators are unscored (grey).
+      * ``force`` re-fetches all four sources. */
+    event facet BuildLivabilityMap(
+        force: Boolean = false
+    ) => (
+        html_path: String,
+        county_count: Int,
+        scored_count: Int,
+        top_county: String,
+        top_score: Double
+    ) with Effect(kind = "external") with Cost(tier = "expensive") with Timeout(minutes = 30)
+}
+
+namespace livability.workflows {
+    use livability.maps
+
+    /** Build the "best county to live in" map: equal-weight composite of 9
+      * open indicators per county, with an explainable ranking. */
+    workflow BuildBestCountyMap(
+        force: Boolean = false
+    ) => (
+        status: String,
+        html_path: String,
+        county_count: Int,
+        scored_count: Int,
+        top_county: String,
+        top_score: Double
+    ) andThen {
+        map = BuildLivabilityMap(force = $.force)
+        yield BuildBestCountyMap(
+            status = "completed",
+            html_path = map.html_path,
+            county_count = map.county_count,
+            scored_count = map.scored_count,
+            top_county = map.top_county,
+            top_score = map.top_score
+        )
+    }
+}
