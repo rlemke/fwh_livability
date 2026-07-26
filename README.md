@@ -5,6 +5,21 @@ composite for ~3,100 US counties, rendered as a national MapLibre choropleth
 plus a top-50 rankings page. Every rank is auditable: the popup shows each
 indicator's raw value and percentile.
 
+## Feature specifications
+
+Each feature has a spec in [**`docs/`**](docs/README.md) — how it works,
+whether/how it **fans out**, the **data & fields** it touches, the **external
+libraries** it uses, its **facets & workflows**, and its **cache/output**. Start
+with the flagship [**Composite Livability Score**](docs/composite-scoring.md)
+(signed percentiles + equal-weight, missing-aware mean); the full index is in
+[`docs/README.md`](docs/README.md).
+
+| Area | Specs |
+|------|-------|
+| **Flagship — scoring** | [composite-scoring](docs/composite-scoring.md) |
+| **Data & joins** | [data-sources](docs/data-sources.md) · [county-geometry](docs/county-geometry.md) |
+| **Rendering & runtime** | [map-and-output](docs/map-and-output.md) · [facets-and-handlers](docs/facets-and-handlers.md) |
+
 ## Method
 
 Each indicator is percentile-ranked across all counties, direction-signed so
