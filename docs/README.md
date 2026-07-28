@@ -32,6 +32,7 @@ indicators), the method every rank on the map is auditable against.
 |------|----------------|
 | [map-and-output.md](map-and-output.md) | GeoJSON → national MapLibre choropleth + explainable per-indicator popup, top-50 rankings page, attribution; `shapely` simplify; `counties.geojson`/`index.html`/`rankings.html` under `cache/livability/output/`. |
 | [facets-and-handlers.md](facets-and-handlers.md) | The single event facet `BuildLivabilityMap` + `BuildBestCountyMap` workflow, handler registration/dispatch, `DomainPackage`/entry point, `runner_env` timeouts, storage-backend selection. |
+| [ffl-examples.md](ffl-examples.md) | **Usage patterns.** A gallery of complete, compile-checked FFL examples over this domain's facet — minimal workflow, `$`-scoping, call-time mixins, `catch`, `when` coverage guards, cross-domain publish. |
 
 ---
 

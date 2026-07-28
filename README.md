@@ -5,6 +5,39 @@ composite for ~3,100 US counties, rendered as a national MapLibre choropleth
 plus a top-50 rankings page. Every rank is auditable: the popup shows each
 indicator's raw value and percentile.
 
+## FFL at a glance
+
+The domain is driven from [FFL](https://github.com/rlemke/facetwork/blob/main/docs/reference/language/grammar.md),
+Facetwork's workflow language. A step is `name = Facet(args)`, and later steps
+reference earlier ones as `step.field`:
+
+```ffl
+namespace my.livability {
+
+    use livability.maps
+
+    /** Rebuild the composite and report which county came out on top. */
+    workflow BestCountyHeadline(force: Boolean = false) => (headline: String, html_path: String) andThen {
+
+        map = livability.maps.BuildLivabilityMap(force = $.force)
+
+        yield BestCountyHeadline(
+            headline = "top county: " ++ map.top_county,
+            html_path = map.html_path)
+    }
+}
+```
+
+```bash
+fw ffl run --primary my.ffl --library src/livability/ffl/livability.ffl \
+  --workflow my.livability.BestCountyHeadline --inputs '{"force": true}'
+```
+
+📖 **[docs/ffl-examples.md](docs/ffl-examples.md)** — the full example gallery:
+call-time mixins (timeout/retry), `catch`, `when` coverage guards, wrapping the
+shipped workflow, and cross-domain composition (publishing). Every snippet there
+is compile-checked.
+
 ## Feature specifications
 
 Each feature has a spec in [**`docs/`**](docs/README.md) — how it works,
