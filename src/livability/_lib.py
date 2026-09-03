@@ -249,29 +249,19 @@ def assemble_counties() -> list[dict]:
 
 
 def _list_census_states() -> list[str]:
-    import boto3
-    data_root = cstore._data_root()
-    if cstore.is_remote(data_root):
-        bucket = data_root.split("://", 1)[1].split("/", 1)[0]
-        s3 = boto3.client(
-            "s3", endpoint_url=os.environ.get("FW_S3_ENDPOINT"),
-            aws_access_key_id=os.environ.get("FW_S3_ACCESS_KEY"),
-            aws_secret_access_key=os.environ.get("FW_S3_SECRET_KEY"),
-        )
-        states = set()
-        for pg in s3.get_paginator("list_objects_v2").paginate(
-            Bucket=bucket, Prefix=CENSUS_METRICS_PREFIX + "/"
-        ):
-            for o in pg.get("Contents", []):
-                if o["Key"].endswith("/metrics.geojson"):
-                    states.add(o["Key"].split("/")[-2])
-        return sorted(states)
-    base = cstore.join(data_root, CENSUS_METRICS_PREFIX)
-    if os.path.isdir(base):
-        return sorted(d for d in os.listdir(base)
-                      if os.path.exists(os.path.join(base, d, "metrics.geojson")))
-    return []
+    """States that have a published metrics.geojson.
 
+    ⚠️ This was three byte-identical copies across fwh_h1b, fwh_livability and
+    fwh_osm_mapping, each building its OWN boto3 client for the S3 half —
+    clients that omitted the region and the AWS_* credential fallback every
+    other client in the codebase has. They worked only because this fleet always
+    sets FW_S3_*. One implementation now, over the runtime backend, so local and
+    s3:// take the same path.
+    """
+    from facetwork.domains.storage import subdirs_containing
+
+    base = cstore.join(cstore._data_root(), CENSUS_METRICS_PREFIX)
+    return subdirs_containing(base, "metrics.geojson")
 
 def _census_metrics_path(state: str) -> str:
     return cstore.join(cstore._data_root(), CENSUS_METRICS_PREFIX, state, "metrics.geojson")
