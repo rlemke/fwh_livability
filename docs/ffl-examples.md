@@ -204,12 +204,15 @@ namespace my.livability {
             prefixes = ["livability/output"],
             dests = ["us/livability"],
             labels = ["Best county to live in"],
-            landing_title = "Facetwork maps")
+            landing_title = "Facetwork maps") after map
 
         yield LivabilityPublish(pages_url = published.pages_url)
     }
 }
 ```
+
+No value flows from `map` into the publish (it reads the store), so
+`after map` is what orders the publish behind the build.
 
 Compile that one with the census publisher's FFL as well:
 `--library ~/fw_handlers/fwh_census_us/src/census_us/handlers/publish/ffl/census_publish.ffl
