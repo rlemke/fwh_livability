@@ -63,10 +63,10 @@ facet and yields the results. This is the entry point for `fw ffl run`.
 ## External libraries / binaries
 
 - **`facetwork`** — `DomainPackage` (entry-point contract),
-  `facetwork.runtime.storage` + `facetwork.config.get_output_base` (via
-  `storage.py`).
+  `facetwork.domains.storage` (via the `storage.py` shim, which sits on
+  `facetwork.runtime.storage` + `facetwork.config.get_output_base`).
 - Handler itself pulls no third-party deps directly; the work deps (`requests`,
-  `shapely`, `boto3`) live in `_lib`/`storage` — see the other specs.
+  `shapely`) live in `_lib` — see the other specs.
 
 ## Facets & workflows
 
@@ -77,7 +77,8 @@ mixins are the only mixins present.
 ## Cache / output
 
 The handler returns `html_path` pointing at `cache/livability/output/index.html`.
-Storage backend selection lives in `storage.py`: `_data_root()` = `FW_DATA_ROOT` or
+Storage backend selection lives in the shared `facetwork.domains.storage`
+(`domain_storage("livability")`, wrapped by `storage.py`): `_data_root()` = `FW_DATA_ROOT` or
 `get_output_base()`; remote (`s3://`) roots route cache/output under
 `cache/livability/{cache,output}/`, local roots under
 `livability-{cache,output}/`. `runner_env` on the `DomainPackage` raises

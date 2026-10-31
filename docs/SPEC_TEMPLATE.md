@@ -32,7 +32,7 @@ no data selection, say so.
 
 ## External libraries / binaries
 Every non-stdlib dependency this feature relies on and what for — e.g. `requests`
-(HTTP fetch), `shapely` (geometry simplify/mapping), `boto3` (S3 listing),
+(HTTP fetch), `shapely` (geometry simplify/mapping),
 `maplibre-gl` (browser-side, CDN). Distinguish a **binary** dependency from a
 **pip** one, and note browser-CDN assets separately.
 

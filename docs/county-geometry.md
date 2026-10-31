@@ -19,10 +19,11 @@ domain (silent join failure → a blank or half-grey map).
 ## How it works
 
 1. **Discover states.** `_list_census_states()` finds every state directory under
-   `cache/census-us/output/metrics/<STATE>/metrics.geojson`. On a remote
-   (`s3://…`) data root it uses `boto3` to paginate the bucket; on a local root it
-   lists the directory. Either way it returns the states that actually have a
-   `metrics.geojson`.
+   `cache/census-us/output/metrics/<STATE>/metrics.geojson`, via the shared
+   `facetwork.domains.storage.subdirs_containing` — one implementation over the
+   runtime storage backend, so a local root and an `s3://` root take the same path.
+   It returns the states that actually have a `metrics.geojson` (empty for an
+   unseeded cache: a cold start, not an error).
 2. **Assemble counties.** `assemble_counties()` reads each state's
    `metrics.geojson`, and for every feature keeps
    `{geoid, name, state, geometry}` — the county `name` is the part of the metrics
@@ -59,10 +60,11 @@ there is no per-state fleet task.)
 
 ## External libraries / binaries
 
-- **`boto3`** (pip, imported lazily inside `_list_census_states`) — only on a remote
-  data root, to list the census-us metrics prefix in the MinIO/S3 bucket using
-  `FW_S3_ENDPOINT` / `FW_S3_ACCESS_KEY` / `FW_S3_SECRET_KEY`.
-- **stdlib** `os`/`json` for local-path discovery and reading.
+- **`facetwork.domains.storage.subdirs_containing`** — state discovery. This repo no
+  longer builds its own `boto3` client; on an `s3://` root the runtime's shared S3
+  client (`FW_S3_ENDPOINT` / `FW_S3_ACCESS_KEY` / `FW_S3_SECRET_KEY`, with the
+  `AWS_*` fallback) does the listing.
+- **stdlib** `json` for reading.
 - Geometry is *read* here; `shapely` simplification happens at render
   (see [map-and-output](map-and-output.md)).
 

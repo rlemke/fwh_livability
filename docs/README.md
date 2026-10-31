@@ -24,7 +24,7 @@ indicators), the method every rank on the map is auditable against.
 | Spec | What it covers |
 |------|----------------|
 | [data-sources.md](data-sources.md) | The four sources feeding the nine indicators — Census ACS (6 indicators, table IDs), CDC PLACES (`GHLTH`), FEMA NRI (ArcGIS FeatureServer, paged `RISK_SCORE`), EPA AirData (median AQI, name-keyed); cache-first fetchers, `_num` suppression guard. |
-| [county-geometry.md](county-geometry.md) | Reuse of the census-us cached per-state metrics GeoJSON; **AFF-style `0500000US*` → bare-FIPS** `normalize_geoid`; the AQI state+county **name** join (`norm_county`, `_NAME_SUFFIXES`); `boto3` S3 state discovery. |
+| [county-geometry.md](county-geometry.md) | Reuse of the census-us cached per-state metrics GeoJSON; **AFF-style `0500000US*` → bare-FIPS** `normalize_geoid`; the AQI state+county **name** join (`norm_county`, `_NAME_SUFFIXES`); state discovery over the shared storage layer (`subdirs_containing`). |
 
 ## Rendering & runtime
 

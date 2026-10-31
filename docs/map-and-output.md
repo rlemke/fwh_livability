@@ -27,7 +27,7 @@ Inside `build_livability_map`, after scoring:
    the payload while keeping topology.
 2. **Render the map** (`_render_html`): a self-contained HTML doc embedding the
    FeatureCollection as `const FC=…` and the indicator metadata as `const INDS=…`.
-   A CARTO Voyager raster basemap underlays a `fill` layer coloured by a green
+   A keyless OpenStreetMap raster basemap (`tile.openstreetmap.org`) underlays a `fill` layer coloured by a green
    `RAMP` (0→100) via a MapLibre `interpolate` expression, with `score==null → #ccc`
    (grey). Interactions: click → the explainable popup (a `value | pctile` table
    over `INDS`), a county search box (`fitBounds` to a computed bbox), a "Top 50"
@@ -63,7 +63,8 @@ totals) are passed into the About modal.
 - **stdlib** — `json` (embed FC/INDS), `html.escape` (rankings + attribution),
   `datetime` (attribution timestamp).
 - **Browser-side, via CDN (not pip):** `maplibre-gl@4.7.1` (JS + CSS from unpkg) and
-  CARTO Voyager raster basemap tiles. These load at view time in the browser; they
+  OpenStreetMap raster basemap tiles (keyless; CARTO was dropped after it began
+  watermarking unauthenticated tiles in Aug 2026). These load at view time in the browser; they
   are **not** Python dependencies and are not vendored.
 
 ## Facets & workflows
@@ -97,7 +98,7 @@ land in shared MinIO under `s3://afl-cache/cache/livability/output/`.
   shrinks `counties.geojson`; tightening it inflates the embedded payload (the whole
   FC ships inside `index.html`).
 - **CDN assets require network at view time.** The map is self-contained HTML but
-  pulls MapLibre + basemap tiles from unpkg/CARTO in the browser — an offline viewer
+  pulls MapLibre + basemap tiles from unpkg/OpenStreetMap in the browser — an offline viewer
   sees no basemap. (Server-side rendering has no such dependency.)
 - **`_render_html`/`_render_rankings` are smoke-tested** (`test_render_*_smoke`)
   including a round-trip of the embedded `FC` JSON and the strongest-on label
